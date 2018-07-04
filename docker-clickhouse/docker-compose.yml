@@ -1,0 +1,51 @@
+version: '3.0'
+services:
+    server:
+        image: yandex/clickhouse-server
+        restart: always
+        container_name: clickhouse-server
+        hostname: server
+        ports:
+            - 8123:8123
+            - 9000:9000
+        links:
+            - mysql:mysql
+        volumes:
+            - /Volumes/data/docker/clickhouse:/var/lib/clickhouse/
+
+    mysql:
+        image: mysql:5.5.60
+        restart: always
+        hostname: mysql
+        container_name: mysql
+        ports:
+            - 3310:3306
+        environment:
+            - MYSQL_ROOT_PASSWORD=mysql
+        volumes:
+            - /Volumes/data/docker/mysql5:/var/lib/mysql
+
+    tabix:
+        image: spoonest/clickhouse-tabix-web-client
+        restart: always
+        hostname: tabix
+        container_name: tabix
+        depends_on:
+            - server
+        links:
+            - mysql:mysql
+            - server:server
+        ports:
+            - 8080:80
+        environment:
+            - USER=tabix
+            - PASSWORD=tabix
+            - CH_NAME=clickhouse
+            - CH_HOST=server:8123
+            - CH_LOGIN=default
+            - CH_PASSWORD=
+
+networks:
+  default:
+    external:
+      name: local
