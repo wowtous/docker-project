@@ -27,7 +27,7 @@ version: '3.1'
 
 services:
   zoo1:
-    image: darebeat/docker-zookeeper
+    image: daocloud.io/darebeat/docker-zookeeper
     restart: always
     container_name: zoo1
     hostname: zoo1
@@ -38,7 +38,7 @@ services:
       ZK_SERVERS: server.1=0.0.0.0:2888:3888 server.2=zoo2:2888:3888 server.3=zoo3:2888:3888
 
   zoo2:
-    image: darebeat/docker-zookeeper
+    image: daocloud.io/darebeat/docker-zookeeper
     restart: always
     container_name: zoo2
     hostname: zoo2
@@ -49,7 +49,7 @@ services:
       ZK_SERVERS: server.1=zoo1:2888:3888 server.2=0.0.0.0:2888:3888 server.3=zoo3:2888:3888
 
   zoo3:
-    image: darebeat/docker-zookeeper
+    image: daocloud.io/darebeat/docker-zookeeper
     restart: always
     container_name: zoo3
     hostname: zoo3
