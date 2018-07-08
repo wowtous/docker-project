@@ -2,19 +2,11 @@ FROM daocloud.io/darebeat/docker-java8
 
 MAINTAINER darebeat<fengwei2010@126.com>
 
-ENV ZOOKEEPER_VERSION 3.4.9
-ENV ZK_HOME /opt/zookeeper-${ZOOKEEPER_VERSION}
+ENV ZOOKEEPER_VERSION=3.4.12
+ENV ZK_HOME=/opt/zookeeper-${ZOOKEEPER_VERSION}
 
 # Download Zookeeper
-RUN wget -q http://mirror.vorboss.net/apache/zookeeper/zookeeper-${ZOOKEEPER_VERSION}/zookeeper-${ZOOKEEPER_VERSION}.tar.gz \
- && wget -q https://www.apache.org/dist/zookeeper/KEYS \
- && wget -q https://www.apache.org/dist/zookeeper/zookeeper-${ZOOKEEPER_VERSION}/zookeeper-${ZOOKEEPER_VERSION}.tar.gz.asc \
- && wget -q https://www.apache.org/dist/zookeeper/zookeeper-${ZOOKEEPER_VERSION}/zookeeper-${ZOOKEEPER_VERSION}.tar.gz.md5
-
-# Verify download
-RUN md5sum -c zookeeper-${ZOOKEEPER_VERSION}.tar.gz.md5 \
- && gpg --import KEYS \
- && gpg --verify zookeeper-${ZOOKEEPER_VERSION}.tar.gz.asc
+RUN wget -q http://mirror.vorboss.net/apache/zookeeper/zookeeper-${ZOOKEEPER_VERSION}/zookeeper-${ZOOKEEPER_VERSION}.tar.gz
 
 # Install
 RUN tar -xzf zookeeper-${ZOOKEEPER_VERSION}.tar.gz -C /opt \
