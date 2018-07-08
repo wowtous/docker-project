@@ -2,23 +2,30 @@ FROM daocloud.io/darebeat/docker-java8
 
 MAINTAINER darebeat<fengwei2010@126.com>
 
-ENV ZOOKEEPER_VERSION=3.4.12
-ENV ZK_HOME=/opt/zookeeper-${ZOOKEEPER_VERSION}
+ARG ZK_VERSION=3.4.12
+ENV	ZK_HOME=/opt/zookeeper-${ZK_VERSION} \
+	ZK_CONF_DIR=/opt/zookeeper-${ZK_VERSION}/conf \
+    ZK_DATA_DIR=/opt/zookeeper-${ZK_VERSION}/data \
+    ZK_DATA_LOG_DIR=/opt/zookeeper-${ZK_VERSION}/logs \
+    ZK_PORT=2181 \
+    ZK_TICK_TIME=2000 \
+    ZK_INIT_LIMIT=5 \
+    ZK_SYNC_LIMIT=2 \
+    ZK_MAX_CLIENT_CNXNS=60
 
 # Download Zookeeper
-RUN wget -q http://mirror.vorboss.net/apache/zookeeper/zookeeper-${ZOOKEEPER_VERSION}/zookeeper-${ZOOKEEPER_VERSION}.tar.gz
+RUN wget -q http://mirror.vorboss.net/apache/zookeeper/zookeeper-${ZK_VERSION}/zookeeper-${ZK_VERSION}.tar.gz \
+&& tar -xzf zookeeper-${ZK_VERSION}.tar.gz -C /opt \
+&& rm -rf zookeeper-${ZK_VERSION}.tar.gz
 
-# Install
-RUN tar -xzf zookeeper-${ZOOKEEPER_VERSION}.tar.gz -C /opt \
-# Configure
-  && mv /opt/zookeeper-${ZOOKEEPER_VERSION}/conf/zoo_sample.cfg /opt/zookeeper-${ZOOKEEPER_VERSION}/conf/zoo.cfg \
-  && sed  -i "s|/tmp/zookeeper|$ZK_HOME/data|g" $ZK_HOME/conf/zoo.cfg; mkdir $ZK_HOME/data \
-  && sed -i -r 's|#(log4j.appender.ROLLINGFILE.MaxBackupIndex.*)|\1|g' $ZK_HOME/conf/log4j.properties \
-  && sed -i -r 's|#autopurge|autopurge|g' $ZK_HOME/conf/zoo.cfg
+EXPOSE ${ZK_PORT} 2888 3888
 
-EXPOSE 2181 2888 3888
+WORKDIR ${ZK_HOME}
+VOLUME ["${ZK_CONF_DIR}", "${ZK_DATA_DIR}"]
 
-WORKDIR /opt/zookeeper-${ZOOKEEPER_VERSION}
-VOLUME ["/opt/zookeeper-${ZOOKEEPER_VERSION}/conf", "/opt/zookeeper-${ZOOKEEPER_VERSION}/data"]
+ENV PATH=$PATH:/opt/zookeeper-${ZK_VERSION}/bin \
+    ZOOCFGDIR=/opt/zookeeper-${ZK_VERSION}/conf
 
-CMD /usr/sbin/sshd && /opt/zookeeper-${ZOOKEEPER_VERSION}/bin/zkServer.sh start-foreground
+COPY docker-entrypoint.sh /
+ENTRYPOINT ["/docker-entrypoint.sh"]
+CMD ["zkServer.sh", "start-foreground"]
